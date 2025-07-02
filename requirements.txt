@@ -1,0 +1,15 @@
+numpy
+scipy
+matplotlib
+sklearn
+
+matplotlib.pyplot
+matplotlib.font_manager import FontProperties
+scipy.optimize import root_scalar
+scipy.optimize import minimize
+scipy.stats import binom
+scipy.stats import norm
+scipy.special import comb
+scipy.optimize import nnls
+sklearn.mixture import GaussianMixture
+sklearn.metrics import r2_score
