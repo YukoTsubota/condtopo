@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -31,7 +30,6 @@ def make_WLC_poly(degree):
         return (kBT / Lp) * (1/(4*(1 - x)**2) - 0.25 + x + poly)
     return model
 
-# フィッティングと結果保存
 fit_results = []
 
 for deg in range(2, 8):
@@ -50,17 +48,14 @@ fit_results.sort(key=lambda x: x[0])
 popt, _ = curve_fit(WLC, L_data, F_data, p0=[500])
 Lc_fit = popt[0]
 
-# フィッティング曲線を作成
 L_fit0 = np.linspace(min(L_data), max(L_data), 200)
 F_fit0 = WLC(L_fit0, Lc_fit)
 
-# R^2 を計算
 residuals = F_data - WLC(L_data, Lc_fit)
 ss_res = np.sum(residuals**2)
 ss_tot = np.sum((F_data - np.mean(F_data))**2)
 r_squared = 1 - (ss_res / ss_tot)
 
-# プロット
 plt.figure(figsize=(7, 7))
 plt.scatter(L_data, F_data, s=10, color = 'gray', label='w/ SYTOX-Orange')
 plt.plot(L_fit0, F_fit0, color = 'gray', label=f'no correction: Lc={Lc_fit:.2f} μm, $R^2$ = {r_squared:.4f}',linewidth=2)
