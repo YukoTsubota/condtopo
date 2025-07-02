@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jul  2 10:41:39 2025
-
-@author: cooyo
-"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -58,7 +52,7 @@ r2_1000 = compute_r2(F_data, F_eWLC_1000)
 r2_10000 = compute_r2(F_data, F_eWLC_10000)
 r2_poly = compute_r2(F_data, F_polyWLC)
 
-# --- プロット ---
+
 plt.figure(figsize=(7, 7))
 plt.scatter(L_data, F_data, s=10, color='gray', label='w/ SYTOX-Orange')
 
