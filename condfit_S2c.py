@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Apr  9 12:10:31 2025
 
-@author: cooyo
-"""
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,38 +14,38 @@ data_single = np.array([35.3258229, 28.436042, 25.6247089, 32.216392, 26.781, 17
 data_exp = np.array([37.905068,55.844334,98.6094720000001,29.351518,131.910624,61.2757,25.96475,21.759312,19.002396,87.746438,23.69255,65.7349829999999,101.367552,39.683336,42.137376,25.512832,91.890993,0,28.3039,0,29.356096,26.423108,0,20.169294,23.915638,67.725932,0,31.45763,62.534196,79.909632,62.764341,37.567077,78.78138,0,31.01472,72.963176,28.8437,47.708052,62.321804,36.779157,131.631928,168.223122,60.760887,38.826645,93.915432,39.67698,63.452538,31.925236,0,88.84197,21.78936,76.124824,26.40616,27.714294,37.301408,70.825418,27.379296,57.431213,95.3736,40.856703,55.688685,57.31968,0,52.81344,42.453588,26.11323,33.080524,24.11822,9.154024,31.69257,24.048948,44.644464,37.511118,57.241998,17.863076,26.851726,0,69.14769,53.474844,34.967106,70.550534,8.22119999999998,127.733648,0,98.687382,32.371572,33.065459,0,121.099965,55.759,35.387136,29.984256,42.555784,49.798956,34.25016,30.16071,62.508712,32.990013,94.977012,31.37154,28.98903,31.188696,122.25014,14.174072,25.417532,39.575232,102.1293,28.75806,0,26.677539,86.123502,36.474688,41.662608,42.365678,46.811655,79.13088,50.994188,29.567808,36.519609,62.620983,25.150548,133.749209,0,29.349,0,39.882036,0,42.17031,27.17944,25.708848,15.934034,0,35.066682,38.799651,44.97778,30.221952,0,24.504175,61.98108,61.391284,37.31112,27.61495,31.377645,0,35.160856,38.613,62.962752,56.046094,47.64969,36.855248,54.108684,39.071358,16.35271,52.795155,32.14572,16.21461,84.184312,15.226724,0,18.759904,25.12323,0,49.743142,40.466853,56.18452,0,14.064768,0,29.942616,50.541192,0,31.464,114.3732,63.991532,35.837894,31.6017,0,30.61858,29.129952,42.670452,107.103264,428.119692,84.48614,95.313312,43.844172,44.180675,23.948727,22.567207,32.152704,0,48.04614,6.04531200000001,7.54817199999999,0,18.3732,0,20.170143,74.013423,45.872381,31.533846,0,44.022,0,31.48497,35.610681,66.527144,79.578513,0,31.48497,5.239236,65.05917,39.31728
 ])
 
-# 基準分布の中央値と分散
+
 mean = np.mean(data_single)
 var = np.var(data_single)
 
-# フィッティング対象の成分数
+
 n_components = 5
 fixed_means = np.array([(i+1) * mean for i in range(n_components)])
 fixed_vars = np.array([(i+1) * var for i in range(n_components)])
 
-# 最小二乗法で重みだけフィット（正規分布の重ね合わせ）
+
 from scipy.optimize import minimize
 
-# 高解像度のx軸
+
 x_smooth = np.linspace(min(data_exp), max(data_exp), 1000)
 
 
-# ヒストグラム（観測値）
+
 hist_y, hist_x = np.histogram(data_exp, bins=100, density=True)
 hist_xc = 0.5 * (hist_x[:-1] + hist_x[1:])  # ビンの中心
 
-# 正規分布のPDFを各成分について計算
+
 pdf_matrix = np.array([
     norm.pdf(x_smooth, loc=mu, scale=np.sqrt(v)) for mu, v in zip(fixed_means, fixed_vars)
 ]).T  # shape = (len(hist_xc), n_components)
 
-# 最小二乗で重みをフィッティング
+
 def loss(weights):
     model = pdf_matrix @ weights
     model_resampled = np.interp(hist_xc, x_smooth, model)
     return np.sum((hist_y - model_resampled) ** 2)
 
-# 制約: weightsの合計は1, 全て非負
+
 constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 bounds = [(0, 1)] * n_components
 initial_weights = np.ones(n_components) / n_components
@@ -59,11 +54,9 @@ result = minimize(loss, initial_weights, constraints=constraints, bounds=bounds)
 fitted_weights = result.x
 model_pdf = pdf_matrix @ fitted_weights
 
-
-# 描画
 x = np.linspace(min(data_exp), max(data_exp), 1000)
 plt.figure(figsize=(4, 3.2))
-bin_edges = np.arange(0, 240+ 1, 5)  # 0から30まで5刻み
+bin_edges = np.arange(0, 240+ 1, 5)
 plt.hist(data_exp, bins=bin_edges, density=True, alpha=0.2, color = '#00FF00', label='Experimental Data')
 
     
@@ -91,13 +84,3 @@ plt.show()
 fitted_weights, fixed_means, fixed_vars
 
 import pandas as pd
-
-# データをDataFrameにまとめて保存
-df = pd.DataFrame({
-    'Fitted Weights': fitted_weights,
-    'Fixed Means': fixed_means,
-    'Fixed Variances': fixed_vars,
-})
-
-# CSVファイルに保存
-df.to_csv('cond fitting_results.csv', index=False)
